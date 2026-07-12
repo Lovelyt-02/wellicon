@@ -5,6 +5,7 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
 import os
+import json
 import uuid
 import logging
 import requests
@@ -16,10 +17,10 @@ import jwt
 from bson import ObjectId
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File, Depends, Header, Query
 from fastapi.responses import Response as FastAPIResponse
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
-from fastapi.middleware.cors import CORSMiddleware
+
 # ---------- Setup ----------
 mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
@@ -36,15 +37,37 @@ storage_key: Optional[str] = None
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
+
+def parse_cors_origins(raw: Optional[str]) -> List[str]:
+    """Parse CORS_ORIGINS from env: comma-separated, JSON array, or single origin."""
+    defaults = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://wellicon-vso8-seven.vercel.app",
+    ]
+    if not raw or not str(raw).strip():
+        return defaults
+
+    value = str(raw).strip().strip("'").strip('"')
+
+    # JSON array: ["https://a.com","https://b.com"]
+    if value.startswith("["):
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                origins = [str(o).strip().rstrip("/") for o in parsed if str(o).strip()]
+                return origins or defaults
+        except json.JSONDecodeError:
+            logger.warning("CORS_ORIGINS looks like JSON but failed to parse; falling back to split")
+
+    # Comma-separated or single origin
+    origins = [o.strip().strip("'").strip('"').rstrip("/") for o in value.split(",") if o.strip()]
+    return origins or defaults
+
+
 app = FastAPI(title="Wellicon Pharma CMS")
-origins = [
-    o.strip()
-    for o in os.environ.get(
-        "CORS_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173",
-    ).split(",")
-    if o.strip()
-]
+origins = parse_cors_origins(os.environ.get("CORS_ORIGINS"))
+logger.info("CORS allow_origins=%s", origins)
 
 app.add_middleware(
     CORSMiddleware,
@@ -733,12 +756,5 @@ async def on_shutdown():
     client.close()
 
 
-# Include router and middleware
+# Include router
 app.include_router(api_router)
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_credentials=True,
-#     allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
