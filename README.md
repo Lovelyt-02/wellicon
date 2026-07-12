@@ -75,7 +75,22 @@ APP_NAME=wellicon-pharma
 VITE_BACKEND_URL=http://localhost:8000
 ```
 
-> Note: `src/lib/api.js` uses `VITE_BACKEND_URL`. If unset, it defaults to `http://localhost:8000`.
+`src/lib/api.js` reads **`VITE_BACKEND_URL` only** (not `VITE_API_URL` / `REACT_APP_*`).
+
+- **Local:** unset → falls back to `http://localhost:8000` in DEV only.
+- **Production (Vercel):** you **must** set `VITE_BACKEND_URL` to your Railway URL (no trailing slash), then redeploy. Example:
+
+```env
+VITE_BACKEND_URL=https://welliconpharmaceuticals-production-f435.up.railway.app
+```
+
+### Railway CORS
+
+On Railway, set `CORS_ORIGINS` to your Vercel origin(s), comma-separated, e.g.:
+
+```env
+CORS_ORIGINS=https://your-app.vercel.app,http://localhost:5173
+```
 
 ## How to run
 
