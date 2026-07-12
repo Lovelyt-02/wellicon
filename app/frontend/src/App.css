@@ -1,0 +1,97 @@
+/* Wellicon Pharma — global styles */
+
+
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #0F172A;
+  background: #FFFFFF;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+
+.font-display {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Glass header */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Hero gradient backdrop */
+.hero-gradient {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(167, 214, 20, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 70%, rgba(184, 100, 0, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, #F8FAF4 0%, #FFFFFF 100%);
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #E2E8F0, transparent);
+}
+
+/* Subtle grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Product card hover */
+.product-card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 50px -12px rgba(127, 166, 15, 0.22);
+}
+
+/* Sidebar active state */
+.sidebar-link {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link.active {
+  background: rgba(167, 214, 20, 0.14);
+color: #7FA60F;
+}
+
+.sidebar-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #A7D614;
+}
+
+/* Pill / overline */
+.overline {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #7FA60F;
+}
+
+/* Disable default App.css conflict */
+.App-header {
+  display: none;
+}

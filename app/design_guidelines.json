@@ -1,0 +1,185 @@
+{
+  "project_name": "Wellicon Pharmaceuticals Platform",
+  "theme": "light",
+  "archetype": "Organic & Earthy / Medical Clean",
+  "design_philosophy": "A high-end, authoritative, and clinical yet warm pharmaceutical showcase. Blending the trust and precision of medical science with modern SaaS administrative capabilities. Moving away from cheap greens/teals to premium sky and slate blues. Generous whitespace and 'glass/crystal' surfaces to communicate purity and hygiene.",
+  "colors": {
+    "background": {
+      "default": "#FFFFFF",
+      "alt": "#F8FAFC",
+      "dashboard_canvas": "#F1F5F9"
+    },
+    "surface": {
+      "card": "#FFFFFF",
+      "glass": "bg-white/70 backdrop-blur-xl",
+      "solid": "#F8FAFC"
+    },
+    "primary": {
+      "DEFAULT": "#0369A1",
+      "hover": "#0284C7",
+      "foreground": "#FFFFFF"
+    },
+    "secondary": {
+      "DEFAULT": "#0F172A",
+      "hover": "#1E293B",
+      "foreground": "#FFFFFF"
+    },
+    "accent": {
+      "soft_blue": "#E0F2FE",
+      "slate": "#64748B",
+      "success": "#10B981"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#475569",
+      "muted": "#94A3B8",
+      "inverse": "#FFFFFF"
+    },
+    "border": {
+      "default": "#E2E8F0",
+      "subtle": "#F1F5F9"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Manrope, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scales": {
+      "h1": "text-5xl sm:text-6xl tracking-tight font-light",
+      "h2": "text-3xl sm:text-4xl tracking-tight font-medium",
+      "h3": "text-2xl sm:text-3xl tracking-tight font-medium",
+      "h4": "text-xl font-semibold",
+      "body": "text-base leading-relaxed text-slate-600",
+      "small": "text-sm text-slate-500",
+      "overline": "text-xs font-bold uppercase tracking-[0.2em] text-sky-700"
+    },
+    "links": "font-medium text-sky-700 hover:text-sky-900 transition-colors"
+  },
+  "layout_and_spacing": {
+    "marketing": {
+      "container_padding": "px-6 md:px-12 lg:px-24",
+      "section_spacing": "py-20 md:py-32",
+      "grid_bento": "grid grid-cols-1 md:grid-cols-12 gap-8",
+      "bento_spans": {
+        "hero_card": "col-span-1 md:col-span-8 row-span-2",
+        "side_card": "col-span-1 md:col-span-4 row-span-1"
+      }
+    },
+    "dashboard": {
+      "container_padding": "p-6",
+      "grid_layout": "grid grid-cols-1 md:grid-cols-4 gap-6",
+      "sidebar_width": "w-64"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-sky-700 text-white rounded-md px-6 py-3 font-medium hover:bg-sky-600 transition-colors shadow-sm",
+      "secondary": "bg-slate-900 text-white rounded-md px-6 py-3 font-medium hover:bg-slate-800 transition-colors",
+      "outline": "border-2 border-slate-200 text-slate-900 rounded-md px-6 py-3 font-medium hover:border-slate-300 transition-colors",
+      "ghost": "text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md px-4 py-2 transition-colors"
+    },
+    "cards": {
+      "marketing_product": "group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300",
+      "dashboard_widget": "bg-white rounded-lg border border-slate-200 p-6 shadow-sm",
+      "dashboard_table_container": "bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm"
+    },
+    "inputs": {
+      "default": "w-full rounded-md border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:border-transparent transition-shadow",
+      "label": "block text-sm font-medium text-slate-700 mb-1"
+    },
+    "header": {
+      "public": "sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200",
+      "admin": "sticky top-0 z-40 w-full bg-white border-b border-slate-200 px-6 py-3"
+    },
+    "navigation": {
+      "public_links": "hidden md:flex items-center gap-8 text-sm font-medium text-slate-600",
+      "admin_sidebar": "fixed left-0 top-0 h-screen w-64 bg-slate-900 text-slate-300 flex flex-col"
+    }
+  },
+  "pages": {
+    "marketing": {
+      "home": {
+        "hero": "Split layout. Left: Crisp typography (H1) and primary CTA. Right: High-end lab generated image with a subtle gradient overlay to ensure text contrast if overlapping. Use motion.div for staggered entrance.",
+        "categories": "Bento grid showcasing therapeutic segments (Antibacterial, Gastro, etc.) with soft tinted backgrounds (sky-50, slate-50).",
+        "featured_products": "Horizontal scroll or 3-column grid of top products. Cards should have generous padding and clean product imagery.",
+        "about_teaser": "Text-heavy left side with strong H2. Right side uses an image grid (generated abstract images) showing laboratory precision."
+      },
+      "products_listing": {
+        "layout": "Sidebar for category filtering (Tablets, Syrups, Injections). Main content area is a responsive grid of product cards. Crisp white backgrounds.",
+        "product_card": "Image on top (max-h-48, object-contain, padding p-4). Below: Category overline, Product Name (H4), Composition summary (text-sm text-slate-500), 'View Details' ghost button."
+      },
+      "product_detail": {
+        "layout": "Two-column. Left: Large high-quality product image on subtle gray background. Right: Breadcrumbs, Title, Tag/Category, Composition block, Description, and Contact Inquiry CTA."
+      },
+      "contact": {
+        "layout": "Split layout. Left: Corporate address, map placeholder, contact info. Right: Clean, well-spaced Shadcn form (First Name, Last Name, Email, Message, Submit)."
+      }
+    },
+    "dashboard": {
+      "login": {
+        "layout": "Centered clean card on a soft slate background. Minimalist logo, strict validation on form."
+      },
+      "layout": {
+        "structure": "Sidebar left (bg-slate-900), Main content right (bg-slate-50). Top navbar for breadcrumbs and user profile/logout."
+      },
+      "views": {
+        "overview": "Stats cards (Total Products, Total Inquiries, Active Categories) using 'dashboard_widget' card style. Recent inquiries table below.",
+        "products_crud": "Data table layout. Search bar and 'Add Product' button on top right. Table headers: Image, Name, Category, Status, Actions (Edit/Delete). Use Shadcn Dialog for Add/Edit forms.",
+        "categories_crud": "Simple list/table with Add/Edit/Delete capabilities.",
+        "inquiries": "Read-only table showing contact form submissions."
+      }
+    }
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://static.prod-images.emergentagent.com/jobs/83ef7e25-6729-485c-a277-13adf6b5bae2/images/0340a14000abdfa6fe2572e8bfaf2174331e1d6c5839963993c79654a70415cb.png",
+        "category": "hero",
+        "description": "High-end pharmaceutical laboratory. Use for Homepage Hero."
+      },
+      {
+        "url": "https://static.prod-images.emergentagent.com/jobs/83ef7e25-6729-485c-a277-13adf6b5bae2/images/c8e9ea12b401d8b4340e8a29134972a32009a205b35612418ecc97cafd2086c2.png",
+        "category": "background",
+        "description": "Abstract pristine medicine capsules on blue pedestal. Great for About Us section or Category headers."
+      },
+      {
+        "url": "https://static.prod-images.emergentagent.com/jobs/83ef7e25-6729-485c-a277-13adf6b5bae2/images/40ed25b70fa3999788a9fccd30ae5a395d2e3f2fb18bdafcf8e9d6193da4b3fd.png",
+        "category": "product_background",
+        "description": "Premium pharmaceutical packaging boxes. Good for generic product placeholders or featured product banners."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1581159186721-b68b78da4ec9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxtZWRpY2luZSUyMGNhcHN1bGVzJTIwcGlsbHMlMjBsYWJvcmF0b3J5fGVufDB8fHx8MTc3OTA5OTQ2NXww&ixlib=rb-4.1.0&q=85",
+        "category": "generic_product",
+        "description": "Pink and white pill. Use as placeholder for products if none uploaded."
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1598046937895-2be846402c0d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwzfHxtZWRpY2luZSUyMGNhcHN1bGVzJTIwcGlsbHMlMjBsYWJvcmF0b3J5fGVufDB8fHx8MTc3OTA5OTQ2NXww&ixlib=rb-4.1.0&q=85",
+        "category": "generic_product_2",
+        "description": "Red and blue pill. Alternate placeholder for products."
+      }
+    ]
+  },
+  "animations": {
+    "scroll": "Use lenis for smooth momentum scrolling on the public marketing site.",
+    "reveal": "Use framer-motion for staggered Y-axis reveals on typography and bento grid elements.",
+    "hover": "Products and cards should elevate slightly (-translate-y-1) and cast a softer, wider shadow (shadow-xl)."
+  },
+  "icons": {
+    "library": "lucide-react",
+    "usage": "Use crisp, consistent line weights. Typical icons: Pill, Beaker, ShieldCheck, Phone, Mail, LayoutDashboard, Package, List."
+  },
+  "testing": {
+    "attributes": "All interactive elements (buttons, inputs, links, tabs) MUST have data-testid attributes."
+  },
+  "instructions_to_main_agent": [
+    "Build the application as a full-stack system with a public frontend and a secure admin CMS dashboard.",
+    "Do not use generic HTML components for complex interactions; heavily utilize Shadcn UI components customized with the provided colors (sky-700 primary).",
+    "Implement pure HTML+Tailwind for asymmetrical marketing sections rather than rigid Shadcn Cards.",
+    "Apply the 'Glassmorphism' surface rule strictly to the public navigation header.",
+    "For the admin CMS, strictly follow a dense, data-focused layout with a dark sidebar and off-white canvas. Rely heavily on Shadcn tables and forms.",
+    "Use mock JWT auth flow for the admin dashboard if backend integration isn't fully scoped, but create the UI routes securely.",
+    "Ensure the hero section overlay does not exceed bg-black/40 if a dark overlay is used, or preferably use a clean white/split layout as requested."
+  ]
+}

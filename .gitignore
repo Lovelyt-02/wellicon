@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment files
+.env
+app/backend/.env
+app/frontend/.env
+
+# Node
+node_modules/
+dist/
+npm-debug.log*
+yarn-error.log*
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
