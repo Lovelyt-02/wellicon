@@ -5,16 +5,56 @@ import { motion, AnimatePresence } from "framer-motion";
 import api, { fileUrl } from "@/lib/api";
 import { FaLinkedin, FaYoutube, FaInstagram, FaTwitter, FaFacebook, FaWhatsapp } from "react-icons/fa";
 
-const applySiteMeta = (siteSettings) => {
+const applySiteMeta = (siteSettings, pathname = "/") => {
   if (!siteSettings) return;
 
-  const nextTitle = siteSettings.site_title || siteSettings.site_name || "Wellicon Pharma";
-  document.title = nextTitle;
+  let pageTitle = siteSettings.site_title || siteSettings.site_name || "Wellicon Pharma";
+  let pageDesc = siteSettings.site_description || "";
+  let pageKeywords = siteSettings.meta_keywords || "";
 
-  const descriptionMeta = document.querySelector('meta[name="description"]');
-  if (descriptionMeta) {
-    descriptionMeta.setAttribute("content", siteSettings.site_description || "");
+  if (pathname === "/") {
+    pageTitle = siteSettings.seo_home_title || pageTitle;
+    pageDesc = siteSettings.seo_home_description || pageDesc;
+    pageKeywords = siteSettings.seo_home_keywords || pageKeywords;
+  } else if (pathname === "/about") {
+    pageTitle = siteSettings.seo_about_title || "About Us | Wellicon Pharmaceuticals";
+    pageDesc = siteSettings.seo_about_description || pageDesc;
+    pageKeywords = siteSettings.seo_about_keywords || pageKeywords;
+  } else if (pathname.startsWith("/products")) {
+    pageTitle = siteSettings.seo_products_title || "Product Catalogue | Wellicon Pharmaceuticals";
+    pageDesc = siteSettings.seo_products_description || pageDesc;
+    pageKeywords = siteSettings.seo_products_keywords || pageKeywords;
+  } else if (pathname === "/contact") {
+    pageTitle = siteSettings.seo_contact_title || "Contact Us | Wellicon Pharmaceuticals";
+    pageDesc = siteSettings.seo_contact_description || pageDesc;
+    pageKeywords = siteSettings.seo_contact_keywords || pageKeywords;
+  } else if (pathname === "/privacy") {
+    pageTitle = siteSettings.seo_privacy_title || "Privacy Policy | Wellicon Pharmaceuticals";
+    pageDesc = siteSettings.seo_privacy_description || pageDesc;
+    pageKeywords = siteSettings.seo_privacy_keywords || pageKeywords;
+  } else if (pathname === "/terms") {
+    pageTitle = siteSettings.seo_terms_title || "Terms & Conditions | Wellicon Pharmaceuticals";
+    pageDesc = siteSettings.seo_terms_description || pageDesc;
+    pageKeywords = siteSettings.seo_terms_keywords || pageKeywords;
   }
+
+  document.title = pageTitle;
+
+  let descriptionMeta = document.querySelector('meta[name="description"]');
+  if (!descriptionMeta) {
+    descriptionMeta = document.createElement("meta");
+    descriptionMeta.name = "description";
+    document.head.appendChild(descriptionMeta);
+  }
+  descriptionMeta.setAttribute("content", pageDesc);
+
+  let keywordsMeta = document.querySelector('meta[name="keywords"]');
+  if (!keywordsMeta) {
+    keywordsMeta = document.createElement("meta");
+    keywordsMeta.name = "keywords";
+    document.head.appendChild(keywordsMeta);
+  }
+  keywordsMeta.setAttribute("content", pageKeywords);
 
   const iconLink = document.querySelector("link[rel='icon']") || document.createElement("link");
   iconLink.rel = "icon";
@@ -36,7 +76,7 @@ export default function PublicLayout() {
         .get("/settings")
         .then((r) => {
           setSettings(r.data);
-          applySiteMeta(r.data);
+          applySiteMeta(r.data, window.location.pathname);
         })
         .catch(() => { });
       api
@@ -54,9 +94,9 @@ export default function PublicLayout() {
 
   useEffect(() => {
     if (settings) {
-      applySiteMeta(settings);
+      applySiteMeta(settings, pathname);
     }
-  }, [settings]);
+  }, [settings, pathname]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -242,6 +282,16 @@ export default function PublicLayout() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link to="/privacy" className="hover:text-[#D7F171] transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-[#D7F171] transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -271,37 +321,63 @@ export default function PublicLayout() {
 
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm">
-              {settings?.footer_social_media_title || "Social Media"}
+              Legal & Compliance
             </h4>
-            <div className="flex space-x-4">
-              {socialMedia
-                .filter((item) => item.active && item.url)
-                .sort((a, b) => a.display_order - b.display_order)
-                .map((item) => (
-                  <a
-                    key={item.id}
-                    href={item.url}
-                    target={item.open_in_new_tab ? "_blank" : "_self"}
-                    rel={item.nofollow ? "nofollow" : undefined}
-                    className="hover:opacity-80"
-                  >
-                    {item.icon_url ? (
-                      <img src={item.icon_url} alt={item.platform} className="w-5 h-5" />
-                    ) : (
-                      renderIcon(item.platform)
-                    )}
-                  </a>
-                ))}
-            </div>
+            <ul className="space-y-2 text-sm text-[#CBD5E1]">
+              <li>
+                <Link to="/privacy" className="hover:text-[#D7F171] transition-colors flex items-center gap-2">
+                  <span>Privacy Policy</span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-[#D7F171] transition-colors flex items-center gap-2">
+                  <span>Terms & Conditions</span>
+                </Link>
+              </li>
+            </ul>
+            {socialMedia.filter((item) => item.active && item.url).length > 0 && (
+              <div className="mt-4 pt-3 border-t border-[#334155]">
+                <div className="text-xs font-medium text-[#94A3B8] mb-2">Connect With Us</div>
+                <div className="flex space-x-3">
+                  {socialMedia
+                    .filter((item) => item.active && item.url)
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map((item) => (
+                      <a
+                        key={item.id}
+                        href={item.url}
+                        target={item.open_in_new_tab ? "_blank" : "_self"}
+                        rel={item.nofollow ? "nofollow" : undefined}
+                        className="hover:opacity-80 text-white hover:text-[#D7F171]"
+                      >
+                        {item.icon_url ? (
+                          <img src={item.icon_url} alt={item.platform} className="w-4 h-4" />
+                        ) : (
+                          renderIcon(item.platform)
+                        )}
+                      </a>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="border-t border-[#334155]">
-          <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6 text-xs text-[#94A3B8] flex flex-col md:flex-row justify-between gap-2">
-            <span>
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6 text-xs text-[#94A3B8] flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
               © {new Date().getFullYear()} {settings?.company_name || "Wellicon Pharma"}.{" "}
               {settings?.footer_rights_suffix || "All rights reserved."}
-            </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link to="/privacy" className="hover:text-[#D7F171] transition-colors">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-[#D7F171] transition-colors">
+                Terms & Conditions
+              </Link>
+            </div>
             <span>
               {settings?.footer_disclaimer ||
                 "For healthcare professional use. Not for self-medication."}

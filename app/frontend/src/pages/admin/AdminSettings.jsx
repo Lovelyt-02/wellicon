@@ -13,7 +13,9 @@ import FooterSettings from "./FooterSettings";
 import SiteSettings from "./SiteSettings";
 import HeaderSettings from "./HeaderSettings";
 import HomePageSettings from "./HomePageSettings";
-
+import AboutPageSettings from "./AboutPageSettings";
+import RichTextEditor from "@/components/RichTextEditor";
+import PageSeoSection from "@/components/PageSeoSection";
 
 const TABS = [
   { id: "siteSettings", label: "Site Setting" },
@@ -25,11 +27,6 @@ const TABS = [
   { id: "contact", label: "Contact Us Page" },
   { id: "privacy", label: "Privacy Policy" },
   { id: "terms", label: "Terms & Conditions" },
-  { id: "social", label: "Social Media" },
-  { id: "background", label: "Backgrounds" },
-  { id: "globalSeo", label: "Global SEO" },
-  { id: "productSeo", label: "Product SEO" },
-  { id: "theme", label: "Theme" },
 ];
 
 export default function AdminSettings() {
@@ -76,7 +73,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <form onSubmit={save} className="space-y-6 max-w-5xl" data-testid="admin-settings">
+    <form onSubmit={save} className="space-y-6 w-full max-w-none" data-testid="admin-settings">
       <div>
         <h2 className="text-2xl font-display font-semibold text-slate-900">Site Content CMS</h2>
         <p className="text-sm text-slate-500 mt-1">
@@ -157,34 +154,10 @@ export default function AdminSettings() {
       )}
 
       {tab === "about" && (
-        <div className="space-y-6">
-          <Section title="About page content">
-            <Field label="Overline" value={settings.about_overline} onChange={change("about_overline")} />
-            <Field label="Title" value={settings.about_title} onChange={change("about_title")} />
-            <Field label="Body" value={settings.about_body} onChange={change("about_body")} textarea rows={8} />
-            <ImageField
-              label="About image"
-              value={settings.about_image_url}
-              onChange={change("about_image_url")}
-              onUpload={(f) => upload(f, "about_image_url")}
-              inputRef={aboutRef}
-            />
-          </Section>
-          <Section title="Sidebar badges">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Badge 1" value={settings.about_badge1} onChange={change("about_badge1")} />
-              <Field label="Badge 2" value={settings.about_badge2} onChange={change("about_badge2")} />
-              <Field label="Badge 3" value={settings.about_badge3} onChange={change("about_badge3")} />
-              <Field label="Badge 4" value={settings.about_badge4} onChange={change("about_badge4")} />
-            </div>
-          </Section>
-          <Section title="Mission & vision">
-            <Field label="Mission overline" value={settings.about_mission_overline} onChange={change("about_mission_overline")} />
-            <Field label="Mission text" value={settings.about_mission} onChange={change("about_mission")} textarea rows={3} />
-            <Field label="Vision overline" value={settings.about_vision_overline} onChange={change("about_vision_overline")} />
-            <Field label="Vision text" value={settings.about_vision} onChange={change("about_vision")} textarea rows={4} />
-          </Section>
-        </div>
+        <AboutPageSettings
+          value={settings}
+          onChange={(nextSettings) => setSettings(nextSettings)}
+        />
       )}
 
       {tab === "products" && (
@@ -209,6 +182,16 @@ export default function AdminSettings() {
               <Field label="Not found text" value={settings.product_not_found} onChange={change("product_not_found")} />
             </div>
           </Section>
+          <PageSeoSection
+            pageName="Products Page"
+            pageUrl="https://welliconpharma.com/products"
+            titleValue={settings.seo_products_title}
+            descriptionValue={settings.seo_products_description}
+            keywordsValue={settings.seo_products_keywords}
+            onTitleChange={change("seo_products_title")}
+            onDescriptionChange={change("seo_products_description")}
+            onKeywordsChange={change("seo_products_keywords")}
+          />
         </div>
       )}
 
@@ -243,6 +226,76 @@ export default function AdminSettings() {
               <Field label="Success message" value={settings.contact_success} onChange={change("contact_success")} />
             </div>
           </Section>
+          <PageSeoSection
+            pageName="Contact Us Page"
+            pageUrl="https://welliconpharma.com/contact"
+            titleValue={settings.seo_contact_title}
+            descriptionValue={settings.seo_contact_description}
+            keywordsValue={settings.seo_contact_keywords}
+            onTitleChange={change("seo_contact_title")}
+            onDescriptionChange={change("seo_contact_description")}
+            onKeywordsChange={change("seo_contact_keywords")}
+          />
+        </div>
+      )}
+
+      {tab === "privacy" && (
+        <div className="space-y-6">
+          <Section title="Privacy Policy Page Content">
+            <div className="space-y-4">
+              <Field
+                label="Page Headline / Title"
+                value={settings.privacy_title}
+                onChange={change("privacy_title")}
+              />
+              <RichTextEditor
+                label="Privacy Policy Body Content (Rich Text Editor)"
+                value={settings.privacy_content}
+                onChange={(html) => setSettings({ ...settings, privacy_content: html })}
+                placeholder="Type or paste Privacy Policy content..."
+              />
+            </div>
+          </Section>
+          <PageSeoSection
+            pageName="Privacy Policy Page"
+            pageUrl="https://welliconpharma.com/privacy"
+            titleValue={settings.seo_privacy_title}
+            descriptionValue={settings.seo_privacy_description}
+            keywordsValue={settings.seo_privacy_keywords}
+            onTitleChange={change("seo_privacy_title")}
+            onDescriptionChange={change("seo_privacy_description")}
+            onKeywordsChange={change("seo_privacy_keywords")}
+          />
+        </div>
+      )}
+
+      {tab === "terms" && (
+        <div className="space-y-6">
+          <Section title="Terms & Conditions Page Content">
+            <div className="space-y-4">
+              <Field
+                label="Page Headline / Title"
+                value={settings.terms_title}
+                onChange={change("terms_title")}
+              />
+              <RichTextEditor
+                label="Terms & Conditions Body Content (Rich Text Editor)"
+                value={settings.terms_content}
+                onChange={(html) => setSettings({ ...settings, terms_content: html })}
+                placeholder="Type or paste Terms & Conditions content..."
+              />
+            </div>
+          </Section>
+          <PageSeoSection
+            pageName="Terms & Conditions Page"
+            pageUrl="https://welliconpharma.com/terms"
+            titleValue={settings.seo_terms_title}
+            descriptionValue={settings.seo_terms_description}
+            keywordsValue={settings.seo_terms_keywords}
+            onTitleChange={change("seo_terms_title")}
+            onDescriptionChange={change("seo_terms_description")}
+            onKeywordsChange={change("seo_terms_keywords")}
+          />
         </div>
       )}
 

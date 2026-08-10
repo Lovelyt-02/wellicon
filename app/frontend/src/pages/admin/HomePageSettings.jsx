@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Upload, Image as ImageIcon, Palette, Sparkles, Layout, ShieldCheck, Award } from "lucide-react";
 import { fileUrl } from "@/lib/api";
+import PageSeoSection from "@/components/PageSeoSection";
 
 const PRESET_BG_COLORS = [
   { name: "Pure White", value: "#FFFFFF" },
@@ -1122,6 +1123,18 @@ export default function HomePageSettings({ value = {}, onChange, onUpload }) {
           </div>
         </div>
       </section>
+
+      {/* ──────────────── PAGE SEO SETTINGS ──────────────── */}
+      <PageSeoSection
+        pageName="Home Page"
+        pageUrl="https://welliconpharma.com"
+        titleValue={value.seo_home_title}
+        descriptionValue={value.seo_home_description}
+        keywordsValue={value.seo_home_keywords}
+        onTitleChange={(e) => updateField("seo_home_title", e.target.value)}
+        onDescriptionChange={(e) => updateField("seo_home_description", e.target.value)}
+        onKeywordsChange={(e) => updateField("seo_home_keywords", e.target.value)}
+      />
     </div>
   );
 }

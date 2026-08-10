@@ -14,6 +14,8 @@ import About from "@/pages/public/About";
 import Products from "@/pages/public/Products";
 import ProductDetail from "@/pages/public/ProductDetail";
 import Contact from "@/pages/public/Contact";
+import TermsConditions from "@/pages/public/TermsConditions";
+import PrivacyPolicy from "@/pages/public/PrivacyPolicy";
 
 import AdminLogin from "@/pages/admin/AdminLogin";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -33,6 +35,8 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<TermsConditions />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
           </Route>
 
           <Route path="/admin/login" element={<AdminLogin />} />

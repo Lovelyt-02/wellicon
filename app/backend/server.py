@@ -372,12 +372,176 @@ class SiteSettings(BaseModel):
     about_badge2: str = "ISO 9001:2015"
     about_badge3: str = "Pan-India Distribution"
     about_badge4: str = "200+ Healthcare Partners"
-    about_mission_overline: str = "OUR MISSION"
     about_mission: str = "To deliver innovative, affordable and trusted pharmaceutical solutions that improve lives."
-    about_vision_overline: str = "OUR VISION"
     about_vision: str = (
         "To be recognised globally as a benchmark for quality, integrity and innovation in pharmaceuticals — "
         "empowering healthcare professionals and patients with reliable formulations across every therapeutic segment.")
+
+    # About Us Page - 6 Sections Settings
+    about_hero_overline: str = "ABOUT US"
+    about_hero_title: str = "Driven by Science. Built on Trust. Focused on Better Health."
+    about_hero_subtitle: str = "With over 7 years of experience, Wellicon Pharmaceuticals delivers quality generic and OTC healthcare solutions designed around the evolving needs of doctors, patients and healthcare providers."
+    about_hero_btn_text: str = "Explore Our Products"
+    about_hero_btn_link: str = "/products"
+    about_stat1_value: str = "7+"
+    about_stat1_label: str = "Years of Excellence"
+    about_stat2_value: str = "200+"
+    about_stat2_label: str = "Healthcare Partners"
+    about_stat3_value: str = "Pan-India"
+    about_stat3_label: str = "Distribution Network"
+    about_hero_image_url: Optional[str] = None
+    about_hero_image_active: bool = True
+    about_hero_badge_text: str = "WHO-GMP Certified"
+    about_hero_badge_active: bool = True
+    about_hero_bg_color: Optional[str] = None
+    about_hero_bg_image_url: Optional[str] = None
+
+    about_journey_overline: str = "OUR STORY"
+    about_journey_title: str = "A Journey of Commitment and Growth"
+    about_journey_body: str = "From our beginnings to becoming a trusted name in the pharmaceutical industry, our journey has been guided by innovation, quality, and a deep commitment to health and well-being."
+    about_story_m1_year: str = "2017"
+    about_story_m1_title: str = "The Beginning"
+    about_story_m1_desc: str = "Wellicon Pharmaceuticals was founded with a vision to make quality healthcare accessible to all."
+    about_story_m2_year: str = "2019"
+    about_story_m2_title: str = "Expanding Horizons"
+    about_story_m2_desc: str = "Strengthened our product portfolio and entered new therapeutic segments."
+    about_story_m3_year: str = "2022"
+    about_story_m3_title: str = "Strengthening Quality"
+    about_story_m3_desc: str = "Achieved WHO-GMP certification and enhanced our quality management systems."
+    about_story_m4_year: str = "Today"
+    about_story_m4_title: str = "Growing Together"
+    about_story_m4_desc: str = "Continuously expanding our reach and building healthier communities across India."
+    about_journey_bg_color: Optional[str] = "#FFFFFF"
+    about_journey_bg_image_url: Optional[str] = None
+
+    about_purpose_overline: str = "OUR PURPOSE"
+    about_purpose_title: str = "Our Mission and Vision"
+    about_mission_overline: str = "OUR MISSION"
+    about_mission_title: str = "To deliver innovative, affordable and trusted pharmaceutical solutions that improve lives."
+    about_mission_body: str = "We are dedicated to combining innovation, research, and compassion to meet the evolving healthcare needs of patients and communities worldwide."
+    about_vision_overline: str = "OUR VISION"
+    about_vision_title: str = "To be recognised globally as a benchmark for quality, integrity and innovation in pharmaceuticals."
+    about_vision_body: str = "We aim to empower healthcare professionals and patients with reliable formulations across every therapeutic segment."
+    about_purpose_bg_color: Optional[str] = "#F8FAF4"
+    about_purpose_bg_image_url: Optional[str] = None
+
+    about_promise_overline: str = "WHAT OUR CUSTOMERS CAN COUNT ON"
+    about_promise_title: str = "Our Promise of Quality and Care"
+    about_promise_c1_title: str = "Quality"
+    about_promise_c1_desc: str = "Consistent quality standards across every step of manufacturing and delivery."
+    about_promise_c2_title: str = "Affordability"
+    about_promise_c2_desc: str = "Cost-effective products that ensure healthcare remains accessible to all."
+    about_promise_c3_title: str = "Innovation"
+    about_promise_c3_desc: str = "Continuous improvement through research and advanced manufacturing capabilities."
+    about_promise_c4_title: str = "Trust"
+    about_promise_c4_desc: str = "Built strong relationships through transparency, ethics, and reliability."
+    about_promise_bg_color: Optional[str] = "#FFFFFF"
+    about_promise_bg_image_url: Optional[str] = None
+
+    # Section 5: Certifications
+    about_cert_overline: str = "QUALITY THAT YOU CAN TRUST"
+    about_cert_title: str = "Certified for Your Safety and Well-being"
+    about_cert_subtitle: str = "Our global certifications ensure that every product we deliver meets the highest standards of quality, safety, and efficacy."
+    about_cert_btn_text: str = "View All Certifications"
+    about_cert_btn_link: str = "#certifications"
+    about_cert_b1_title: str = "WHO-GMP"
+    about_cert_b1_sub: str = "Certified"
+    about_cert_b2_title: str = "ISO 9001:2015"
+    about_cert_b2_sub: str = "Certified"
+    about_cert_b3_title: str = "Quality"
+    about_cert_b3_sub: str = "Assurance"
+    about_cert_b4_title: str = "Safety &"
+    about_cert_b4_sub: str = "Compliance"
+    about_cert_image_url: Optional[str] = None
+    about_cert_bg_color: Optional[str] = "#FFFFFF"
+    about_cert_bg_image_url: Optional[str] = None
+
+    # Section 6: Therapeutic Segments
+    about_segment_overline: str = "THERAPEUTIC EXPERTISE"
+    about_segment_title: str = "Wide Range of Therapeutic Segments"
+    about_segment_bg_color: Optional[str] = "#F8FAF4"
+    about_segment_bg_image_url: Optional[str] = None
+
+    about_expertise_overline: str = "THERAPEUTIC SEGMENTS"
+    about_expertise_title: str = "Comprehensive coverage across therapeutic segments"
+    about_expertise_subtitle: str = "We manufacture and distribute high-grade formulations spanning major medical specialties."
+    about_expertise_tags: str = "Gastroenterology, Antibacterials, Anti-Allergic, Injectables, Dermatological, Pediatric Care, Nutraceuticals, Pain Management"
+    about_expertise_bg_color: Optional[str] = None
+    about_expertise_bg_image_url: Optional[str] = None
+
+    about_cta_title: str = "Building Better Health, Together."
+    about_cta_subtitle: str = "From quality formulations to trusted partnerships, our journey continues with one goal – delivering healthcare solutions that make a meaningful difference."
+    about_cta_btn1_text: str = "Explore Our Products"
+    about_cta_btn1_link: str = "/products"
+    about_cta_btn_text: str = "Get in Touch"
+    about_cta_btn_link: str = "/contact"
+    about_cta_bg_color: Optional[str] = "#3F6826"
+    about_cta_bg_image_url: Optional[str] = None
+
+    # Terms & Conditions
+    terms_title: str = "Terms & Conditions"
+    terms_content: str = """<h1>Terms & Conditions</h1>
+<p>Welcome to <strong>Wellicon Pharmaceuticals</strong>. By accessing or using our website and services, you agree to comply with and be bound by the following terms and conditions.</p>
+
+<h2>1. General Information</h2>
+<p>Wellicon Pharmaceuticals provides information regarding generic and OTC pharmaceutical products for general awareness and educational purposes. Content provided on this website does not constitute medical advice or diagnosis.</p>
+
+<h2>2. Intellectual Property</h2>
+<p>All trademarks, logos, texts, graphics, and product names on this website are the property of Wellicon Pharmaceuticals. Unauthorized reproduction or commercial use without express written permission is strictly prohibited.</p>
+
+<h2>3. Product Information & Disclaimer</h2>
+<p>Product details, compositions, and therapeutic specifications are subject to regulatory standards and healthcare provider discretion. Patients should consult qualified medical practitioners prior to consuming any pharmaceutical product.</p>
+
+<h2>4. Limitation of Liability</h2>
+<p>Wellicon Pharmaceuticals shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our website or reliance on information provided herein.</p>
+
+<h2>5. Governing Law</h2>
+<p>These terms and conditions are governed by and construed in accordance with the laws of India, and any disputes shall be subject to the exclusive jurisdiction of the courts in Chandigarh, India.</p>"""
+
+    # Privacy Policy
+    privacy_title: str = "Privacy Policy"
+    privacy_content: str = """<h1>Privacy Policy</h1>
+<p>At <strong>Wellicon Pharmaceuticals</strong>, protecting your privacy and personal data is our utmost priority. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+
+<h2>1. Information We Collect</h2>
+<p>We may collect personal information that you voluntarily provide to us when submitting inquiries, contact forms, or franchise applications, including your name, email address, phone number, and organization details.</p>
+
+<h2>2. How We Use Your Information</h2>
+<p>Information collected is strictly used to process your inquiries, provide customer support, improve our website functionality, and communicate relevant product updates or franchise opportunities.</p>
+
+<h2>3. Data Protection & Security</h2>
+<p>We implement robust administrative, technical, and physical security measures to prevent unauthorized access, alteration, or disclosure of your personal data.</p>
+
+<h2>4. Third-Party Sharing</h2>
+<p>Wellicon Pharmaceuticals does not sell, trade, or rent personal information to third parties. We may share information only with authorized service providers who assist us in operating our services under strict confidentiality agreements.</p>
+
+<h2>5. Contact Us</h2>
+<p>If you have any questions or concerns regarding this Privacy Policy, please contact us at info@welliconpharma.com.</p>"""
+
+    # Page Specific SEO Settings
+    seo_home_title: str = "Wellicon Pharmaceuticals | Trusted Healthcare & Quality Medicine"
+    seo_home_description: str = "Wellicon Pharmaceuticals is a leading pharmaceutical manufacturer and PCD franchise provider delivering quality medicines across India."
+    seo_home_keywords: str = "Wellicon Pharma, PCD Pharma Franchise, Quality Medicines, Pharmaceutical Company Chandigarh"
+
+    seo_about_title: str = "About Us | Wellicon Pharmaceuticals"
+    seo_about_description: str = "Learn about Wellicon Pharmaceuticals, our story, mission, quality certifications, and commitment to healthcare excellence."
+    seo_about_keywords: str = "About Wellicon Pharma, Pharmaceutical Manufacturing, GMP Certified Pharma, Indian Pharma Company"
+
+    seo_products_title: str = "Product Catalogue | Wellicon Pharmaceuticals"
+    seo_products_description: str = "Browse our comprehensive pharmaceutical catalogue spanning tablets, capsules, syrups, injectables, and nutraceuticals."
+    seo_products_keywords: str = "Pharma Products, Tablets, Capsules, Syrups, Injectables, PCD Product List"
+
+    seo_contact_title: str = "Contact Us | Wellicon Pharmaceuticals"
+    seo_contact_description: str = "Get in touch with Wellicon Pharmaceuticals for franchise inquiries, distribution partnerships, or general support."
+    seo_contact_keywords: str = "Contact Wellicon Pharma, PCD Franchise Inquiry, Pharma Distribution Contact"
+
+    seo_privacy_title: str = "Privacy Policy | Wellicon Pharmaceuticals"
+    seo_privacy_description: str = "Read our Privacy Policy to understand how Wellicon Pharmaceuticals collects, uses, and safeguards your personal data."
+    seo_privacy_keywords: str = "Privacy Policy, Data Protection, Wellicon Pharma Privacy"
+
+    seo_terms_title: str = "Terms & Conditions | Wellicon Pharmaceuticals"
+    seo_terms_description: str = "Read the Terms & Conditions governing the use of Wellicon Pharmaceuticals website and services."
+    seo_terms_keywords: str = "Terms & Conditions, Legal Terms, Wellicon Pharma Disclaimers"
     
 
     # Products page

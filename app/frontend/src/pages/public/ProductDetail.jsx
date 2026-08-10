@@ -18,6 +18,63 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (product) {
+      // 1. Dynamic Page Title & Meta Tags for Google Crawlers
+      const pageTitle = product.meta_title || `${product.name} ${product.composition ? `(${product.composition})` : ""} | Wellicon Pharmaceuticals`;
+      const pageDesc = product.meta_description || product.description || `Inquire about ${product.name} (${product.composition}) manufactured by Wellicon Pharmaceuticals.`;
+      const pageKeywords = product.meta_keywords || `${product.name}, ${product.composition}, ${product.category?.name || "Pharmaceuticals"}, Wellicon Pharma`;
+
+      document.title = pageTitle;
+
+      let descMeta = document.querySelector('meta[name="description"]');
+      if (!descMeta) {
+        descMeta = document.createElement("meta");
+        descMeta.name = "description";
+        document.head.appendChild(descMeta);
+      }
+      descMeta.setAttribute("content", pageDesc);
+
+      let keyMeta = document.querySelector('meta[name="keywords"]');
+      if (!keyMeta) {
+        keyMeta = document.createElement("meta");
+        keyMeta.name = "keywords";
+        document.head.appendChild(keyMeta);
+      }
+      keyMeta.setAttribute("content", pageKeywords);
+
+      // 2. Google Schema.org Product Microdata (JSON-LD) for Rich Search Snippets
+      const schemaData = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": product.name,
+        "image": product.image_url ? fileUrl(product.image_url) : undefined,
+        "description": pageDesc,
+        "sku": product.id,
+        "category": product.category?.name || "Pharmaceuticals",
+        "brand": {
+          "@type": "Brand",
+          "name": settings?.company_name || "Wellicon Pharmaceuticals"
+        },
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "INR",
+          "availability": "https://schema.org/InStock",
+          "url": window.location.href
+        }
+      };
+
+      let scriptTag = document.getElementById("product-schema-jsonld");
+      if (!scriptTag) {
+        scriptTag = document.createElement("script");
+        scriptTag.id = "product-schema-jsonld";
+        scriptTag.type = "application/ld+json";
+        document.head.appendChild(scriptTag);
+      }
+      scriptTag.text = JSON.stringify(schemaData);
+    }
+  }, [product, settings]);
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-24 text-slate-500">
