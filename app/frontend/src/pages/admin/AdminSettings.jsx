@@ -2,19 +2,40 @@ import React, { useEffect, useState, useRef } from "react";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
 import api, { fileUrl } from "@/lib/api";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi"; // for up/down buttons
+// Import new admin sections (placeholders for now)
+import SocialMediaSettings from "./SocialMediaSettings";
+import BackgroundSettings from "./BackgroundSettings";
+import GlobalSeoSettings from "./GlobalSeoSettings";
+import ProductSeoSettings from "./ProductSeoSettings";
+import ThemeSettings from "./ThemeSettings";
+import FooterSettings from "./FooterSettings";
+import SiteSettings from "./SiteSettings";
+import HeaderSettings from "./HeaderSettings";
+import HomePageSettings from "./HomePageSettings";
+
 
 const TABS = [
-  { id: "company", label: "Company & Layout" },
+  { id: "siteSettings", label: "Site Setting" },
+  { id: "header", label: "Header" },
+  { id: "footer", label: "Footer" },
   { id: "home", label: "Home Page" },
-  { id: "about", label: "About Page" },
+  { id: "about", label: "About Us Page" },
   { id: "products", label: "Products Page" },
-  { id: "contact", label: "Contact Page" },
+  { id: "contact", label: "Contact Us Page" },
+  { id: "privacy", label: "Privacy Policy" },
+  { id: "terms", label: "Terms & Conditions" },
+  { id: "social", label: "Social Media" },
+  { id: "background", label: "Backgrounds" },
+  { id: "globalSeo", label: "Global SEO" },
+  { id: "productSeo", label: "Product SEO" },
+  { id: "theme", label: "Theme" },
 ];
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState("company");
+  const [tab, setTab] = useState("siteSettings");
   const heroRef = useRef(null);
   const aboutRef = useRef(null);
 
@@ -79,10 +100,26 @@ export default function AdminSettings() {
           </button>
         ))}
       </div>
+      
+      {tab === "siteSettings" && (
+        <SiteSettings value={settings} onChange={(nextSettings) => setSettings(nextSettings)} />
+      )}
 
+      {tab === "header" && (
+        <HeaderSettings value={settings} onChange={(nextSettings) => setSettings(nextSettings)} onUpload={upload} />
+      )}
+
+      {tab === "footer" && (
+        <FooterSettings value={settings} onChange={(nextSettings) => setSettings(nextSettings)} />
+      )}
+
+      {tab === "social" && (
+        <SocialMediaSettings />
+      )}
+      
       {tab === "company" && (
         <div className="space-y-6">
-          <Section title="Company">
+          <Section title="Company & Layout">
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Company name" value={settings.company_name} onChange={change("company_name")} />
               <Field label="Tagline" value={settings.company_tagline} onChange={change("company_tagline")} />
@@ -112,71 +149,11 @@ export default function AdminSettings() {
       )}
 
       {tab === "home" && (
-        <div className="space-y-6">
-          <Section title="Hero">
-            <Field label="Overline" value={settings.hero_overline} onChange={change("hero_overline")} />
-            <Field label="Title" value={settings.hero_title} onChange={change("hero_title")} />
-            <Field label="Subtitle" value={settings.hero_subtitle} onChange={change("hero_subtitle")} textarea rows={3} />
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Primary CTA" value={settings.hero_cta_primary} onChange={change("hero_cta_primary")} />
-              <Field label="Secondary CTA" value={settings.hero_cta_secondary} onChange={change("hero_cta_secondary")} />
-            </div>
-            <ImageField
-              label="Hero image"
-              value={settings.hero_image_url}
-              onChange={change("hero_image_url")}
-              onUpload={(f) => upload(f, "hero_image_url")}
-              inputRef={heroRef}
-            />
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Field label="Stat 1 value" value={settings.hero_stat1_value} onChange={change("hero_stat1_value")} />
-              <Field label="Stat 1 label" value={settings.hero_stat1_label} onChange={change("hero_stat1_label")} />
-              <div />
-              <Field label="Stat 2 value" value={settings.hero_stat2_value} onChange={change("hero_stat2_value")} />
-              <Field label="Stat 2 label" value={settings.hero_stat2_label} onChange={change("hero_stat2_label")} />
-              <div />
-              <Field label="Stat 3 value" value={settings.hero_stat3_value} onChange={change("hero_stat3_value")} />
-              <Field label="Stat 3 label" value={settings.hero_stat3_label} onChange={change("hero_stat3_label")} />
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Image badge label" value={settings.hero_badge_label} onChange={change("hero_badge_label")} />
-              <Field label="Image badge value" value={settings.hero_badge_value} onChange={change("hero_badge_value")} />
-            </div>
-          </Section>
-
-          <Section title="Portfolio & featured">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Portfolio overline" value={settings.home_portfolio_overline} onChange={change("home_portfolio_overline")} />
-              <Field label="Portfolio title" value={settings.home_portfolio_title} onChange={change("home_portfolio_title")} />
-              <Field label="Portfolio link" value={settings.home_portfolio_link} onChange={change("home_portfolio_link")} />
-              <Field label="Featured overline" value={settings.home_featured_overline} onChange={change("home_featured_overline")} />
-              <Field label="Featured title" value={settings.home_featured_title} onChange={change("home_featured_title")} />
-            </div>
-          </Section>
-
-          <Section title="Trust strip">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Card 1 title" value={settings.trust1_title} onChange={change("trust1_title")} />
-              <Field label="Card 1 body" value={settings.trust1_body} onChange={change("trust1_body")} textarea rows={2} />
-              <Field label="Card 2 title" value={settings.trust2_title} onChange={change("trust2_title")} />
-              <Field label="Card 2 body" value={settings.trust2_body} onChange={change("trust2_body")} textarea rows={2} />
-              <Field label="Card 3 title" value={settings.trust3_title} onChange={change("trust3_title")} />
-              <Field label="Card 3 body" value={settings.trust3_body} onChange={change("trust3_body")} textarea rows={2} />
-            </div>
-          </Section>
-
-          <Section title="About teaser on home">
-            <Field label="Overline" value={settings.home_about_overline} onChange={change("home_about_overline")} />
-            <Field label="Read more link" value={settings.home_about_link} onChange={change("home_about_link")} />
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Quality stat value" value={settings.home_quality_stat_value} onChange={change("home_quality_stat_value")} />
-              <Field label="Quality stat label" value={settings.home_quality_stat_label} onChange={change("home_quality_stat_label")} />
-              <Field label="Therapy stat value" value={settings.home_therapy_stat_value} onChange={change("home_therapy_stat_value")} />
-              <Field label="Therapy stat label" value={settings.home_therapy_stat_label} onChange={change("home_therapy_stat_label")} />
-            </div>
-            <p className="text-xs text-slate-500">About title, body, and image are edited in the About Page tab.</p>
-          </Section>
-        </div>
+        <HomePageSettings
+          value={settings}
+          onChange={(nextSettings) => setSettings(nextSettings)}
+          onUpload={upload}
+        />
       )}
 
       {tab === "about" && (

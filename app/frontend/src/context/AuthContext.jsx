@@ -24,7 +24,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
-    if (data.token) localStorage.setItem("wp_token", data.token);
+    if (data.token) {
+      localStorage.setItem("wp_token", data.token);
+      api.defaults.headers.common.Authorization = `Bearer ${data.token}`;
+    }
     setUser(data.user);
     return data.user;
   };
@@ -34,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       await api.post("/auth/logout");
     } catch { }
     localStorage.removeItem("wp_token");
+    delete api.defaults.headers.common.Authorization;
     setUser(null);
   };
 

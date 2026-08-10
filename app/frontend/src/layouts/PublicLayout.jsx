@@ -2,19 +2,61 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { Phone, Mail, MapPin, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "@/lib/api";
+import api, { fileUrl } from "@/lib/api";
+import { FaLinkedin, FaYoutube, FaInstagram, FaTwitter, FaFacebook, FaWhatsapp } from "react-icons/fa";
+
+const applySiteMeta = (siteSettings) => {
+  if (!siteSettings) return;
+
+  const nextTitle = siteSettings.site_title || siteSettings.site_name || "Wellicon Pharma";
+  document.title = nextTitle;
+
+  const descriptionMeta = document.querySelector('meta[name="description"]');
+  if (descriptionMeta) {
+    descriptionMeta.setAttribute("content", siteSettings.site_description || "");
+  }
+
+  const iconLink = document.querySelector("link[rel='icon']") || document.createElement("link");
+  iconLink.rel = "icon";
+  iconLink.href = siteSettings.favicon_url ? fileUrl(siteSettings.favicon_url) : "/favicon.svg";
+  if (!iconLink.parentNode) {
+    document.head.appendChild(iconLink);
+  }
+};
 
 export default function PublicLayout() {
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState(null);
   const { pathname } = useLocation();
+  const [socialMedia, setSocialMedia] = useState([]);
 
   useEffect(() => {
-    api
-      .get("/settings")
-      .then((r) => setSettings(r.data))
-      .catch(() => {});
+    const loadSiteSettings = () => {
+      api
+        .get("/settings")
+        .then((r) => {
+          setSettings(r.data);
+          applySiteMeta(r.data);
+        })
+        .catch(() => { });
+      api
+        .get("/social-media")
+        .then((r) => setSocialMedia(r.data))
+        .catch(() => { });
+    };
+
+    loadSiteSettings();
+    const handleSettingsUpdated = () => loadSiteSettings();
+    window.addEventListener("site-settings-updated", handleSettingsUpdated);
+
+    return () => window.removeEventListener("site-settings-updated", handleSettingsUpdated);
   }, []);
+
+  useEffect(() => {
+    if (settings) {
+      applySiteMeta(settings);
+    }
+  }, [settings]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,6 +69,25 @@ export default function PublicLayout() {
     { to: "/products", label: settings?.nav_products || "Products" },
     { to: "/contact", label: settings?.nav_contact || "Contact" },
   ];
+  const renderIcon = (platform) => {
+    switch (platform.toLowerCase()) {
+      case "linkedin":
+        return <FaLinkedin className="w-5 h-5 text-white" />;
+      case "youtube":
+        return <FaYoutube className="w-5 h-5 text-white" />;
+      case "instagram":
+        return <FaInstagram className="w-5 h-5 text-white" />;
+      case "x":
+      case "twitter":
+        return <FaTwitter className="w-5 h-5 text-white" />;
+      case "facebook":
+        return <FaFacebook className="w-5 h-5 text-white" />;
+      case "whatsapp":
+        return <FaWhatsapp className="w-5 h-5 text-white" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAF4]">
@@ -36,7 +97,7 @@ export default function PublicLayout() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3" data-testid="logo-link">
-            <img src="/logo.png" alt={settings?.company_name || "Wellicon Pharma"} className="w-14 h-14 object-contain" />
+            <img src={settings?.logo_url ? fileUrl(settings.logo_url) : "/logo.png"} alt={settings?.company_name || "Wellicon Pharma"} className="w-14 h-14 object-contain" />
             <div className="leading-tight">
               <div className="font-display font-bold text-[#1E293B] text-lg">
                 {settings?.company_name || "Wellicon Pharma"}
@@ -55,8 +116,7 @@ export default function PublicLayout() {
                 end={l.to === "/"}
                 data-testid={`nav-${l.to === "/" ? "home" : l.to.slice(1)}`}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors ${
-                    isActive ? "text-[#7FA60F]" : "text-[#475569] hover:text-[#1E293B]"
+                  `text-sm font-medium transition-colors ${isActive ? "text-[#7FA60F]" : "text-[#475569] hover:text-[#1E293B]"
                   }`
                 }
               >
@@ -67,10 +127,13 @@ export default function PublicLayout() {
 
           <div className="flex items-center gap-3">
             <Link
-              to="/contact"
+              to={settings?.header_cta_url || "/contact"}
               data-testid="header-cta"
-              className="hidden md:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-all shadow-lg hover:scale-[1.02]"
-              style={{ background: "linear-gradient(135deg, #A7D614 0%, #7FA60F 100%)" }}
+              className="hidden md:inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all shadow-lg hover:scale-[1.02]"
+              style={{
+                background: settings?.header_cta_bg_color || "linear-gradient(135deg, #A7D614 0%, #7FA60F 100%)",
+                color: settings?.header_cta_text_color || "#FFFFFF",
+              }}
             >
               <Phone className="w-4 h-4" />
               {settings?.header_cta || "Get in touch"}
@@ -118,14 +181,17 @@ export default function PublicLayout() {
       </main>
 
       <footer
-        className="mt-24 text-white"
-        style={{ background: "linear-gradient(180deg, #1F2A16 0%, #111827 100%)" }}
+        className="text-white"
+        style={{
+          background: settings?.footer_bg_color || "linear-gradient(180deg, #1F2A16 0%, #111827 100%)",
+          color: settings?.footer_text_color || "#CBD5E1",
+        }}
         data-testid="public-footer"
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 grid md:grid-cols-4 gap-10">
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <img src="/logo.png" alt={settings?.company_name || "Wellicon Pharma"} className="w-14 h-14 object-contain" />
+              <img src={settings?.logo_url ? fileUrl(settings.logo_url) : "/logo.png"} alt={settings?.company_name || "Wellicon Pharma"} className="w-14 h-14 object-contain" />
               <div>
                 <div className="font-display font-semibold text-white text-lg">
                   {settings?.company_name || "Wellicon Pharma"}
@@ -138,6 +204,30 @@ export default function PublicLayout() {
             <p className="text-sm text-[#CBD5E1] leading-relaxed">
               {settings?.company_tagline || "Caring Health · Curing Lives"}
             </p>
+            {/* Social Media Icons */}
+            <div className="flex items-center gap-4 mt-4">
+              {socialMedia
+                .filter((sm) => sm.active && sm.url)
+                .map((sm) => (
+                  <a
+                    key={sm.id}
+                    href={sm.url}
+                    target={sm.open_in_new_tab ? "_blank" : "_self"}
+                    rel={sm.nofollow ? "nofollow" : undefined}
+                    className="text-white hover:text-[#D7F171] transition-colors"
+                  >
+                    {sm.icon_url ? (
+                      <img
+                        src={fileUrl(sm.icon_url)}
+                        alt={sm.platform}
+                        className="w-5 h-5 object-contain"
+                      />
+                    ) : (
+                      renderIcon(sm.platform)
+                    )}
+                  </a>
+                ))}
+            </div>
           </div>
 
           <div>
@@ -181,15 +271,28 @@ export default function PublicLayout() {
 
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm">
-              {settings?.footer_admin_title || "Admin"}
+              {settings?.footer_social_media_title || "Social Media"}
             </h4>
-            <Link
-              to="/admin/login"
-              className="text-sm text-[#D7F171] hover:text-white transition-colors"
-              data-testid="footer-admin-link"
-            >
-              {settings?.footer_admin_link || "CMS Login →"}
-            </Link>
+            <div className="flex space-x-4">
+              {socialMedia
+                .filter((item) => item.active && item.url)
+                .sort((a, b) => a.display_order - b.display_order)
+                .map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    target={item.open_in_new_tab ? "_blank" : "_self"}
+                    rel={item.nofollow ? "nofollow" : undefined}
+                    className="hover:opacity-80"
+                  >
+                    {item.icon_url ? (
+                      <img src={item.icon_url} alt={item.platform} className="w-5 h-5" />
+                    ) : (
+                      renderIcon(item.platform)
+                    )}
+                  </a>
+                ))}
+            </div>
           </div>
         </div>
 

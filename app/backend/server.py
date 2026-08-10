@@ -11,15 +11,22 @@ import logging
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
+from models_extra import SocialMediaItem, BackgroundConfig, ProductSEO
 
 import bcrypt
 import jwt
 from bson import ObjectId
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File, Depends, Header, Query
-from fastapi.responses import Response as FastAPIResponse
+from fastapi.responses import Response as FastAPIResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
+
+UPLOAD_CACHE_DIR = ROOT_DIR / "uploads_cache"
+os.makedirs(UPLOAD_CACHE_DIR, exist_ok=True)
+CACHE_HEADERS = {
+    "Cache-Control": "public, max-age=31536000, immutable",
+}
 
 # ---------- Setup ----------
 mongo_url = os.environ["MONGO_URL"]
@@ -142,17 +149,30 @@ def init_storage() -> Optional[str]:
 
 
 def put_object(path: str, data: bytes, content_type: str) -> dict:
+    # Save locally to disk cache immediately for zero latency fast responses
+    try:
+        local_filepath = UPLOAD_CACHE_DIR / path.replace("/", os.sep)
+        os.makedirs(local_filepath.parent, exist_ok=True)
+        with open(local_filepath, "wb") as f:
+            f.write(data)
+    except Exception as e:
+        logger.warning(f"Local file cache write failed for {path}: {e}")
+
     key = init_storage()
     if not key:
-        raise HTTPException(status_code=500, detail="Storage not available")
-    resp = requests.put(
-        f"{STORAGE_URL}/objects/{path}",
-        headers={"X-Storage-Key": key, "Content-Type": content_type},
-        data=data,
-        timeout=120,
-    )
-    resp.raise_for_status()
-    return resp.json()
+        return {"path": path, "size": len(data)}
+    try:
+        resp = requests.put(
+            f"{STORAGE_URL}/objects/{path}",
+            headers={"X-Storage-Key": key, "Content-Type": content_type},
+            data=data,
+            timeout=120,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.warning(f"Remote storage put error, relying on local copy: {e}")
+        return {"path": path, "size": len(data)}
 
 
 def get_object(path: str):
@@ -198,6 +218,18 @@ class ProductCreate(BaseModel):
     packaging: str = ""
     image_url: Optional[str] = None
     is_active: bool = True
+    # Product SEO fields
+    focus_keyword: Optional[str] = None
+    meta_title: Optional[str] = None
+    meta_description: Optional[str] = None
+    canonical: Optional[str] = None
+    schema: Optional[dict] = None
+    faq_schema: Optional[dict] = None
+    breadcrumb_schema: Optional[dict] = None
+    social_share_image: Optional[str] = None
+    robots: Optional[str] = None
+    slug: Optional[str] = None
+    redirect_301: Optional[str] = None
 
 
 class Product(ProductCreate):
@@ -207,7 +239,32 @@ class Product(ProductCreate):
 
 
 class SiteSettings(BaseModel):
-    # Company / global
+    # ── Site Identity & SEO ──────────────────────────────────────────────────
+    site_name: Optional[str] = "Wellicon Pharma"
+    site_url: Optional[str] = None
+    site_title: Optional[str] = None          # <title> tag for homepage
+    site_description: Optional[str] = None    # default meta description
+    favicon_url: Optional[str] = None
+    meta_keywords: Optional[str] = None
+    og_image_url: Optional[str] = None        # Open Graph / social share image
+    # Company extended fields
+    company_description: Optional[str] = None
+    company_copyright: Optional[str] = None
+    logo_url: Optional[str] = None             # header logo
+    # ── Header Settings ───────────────────────────────────────────────────────
+    header_logo_url: Optional[str] = None
+    header_company_name: Optional[str] = None  # overrides company_name in header
+    header_tagline: Optional[str] = None       # overrides brand_motto in header
+    header_bg_color: Optional[str] = None      # any valid CSS color
+    header_cta_url: Optional[str] = "/contact"
+    header_cta_bg_color: Optional[str] = None
+    header_cta_text_color: Optional[str] = None
+    header_sticky: bool = True
+    header_transparent: bool = False
+    header_show_search: bool = False
+    header_show_cta: bool = True
+    # ── SEO / robots ─────────────────────────────────────────────────────────
+    seo_robots: Optional[str] = None
     company_name: str = "Wellicon Pharma"
     company_tagline: str = "Caring Health · Curing Lives"
     brand_motto: str = "Way To Healthiness"
@@ -218,18 +275,34 @@ class SiteSettings(BaseModel):
     header_cta: str = "Get in touch"
     footer_quick_links_title: str = "Quick Links"
     footer_contact_title: str = "Contact"
+    footer_social_media_title: str = "Social Media"
     footer_admin_title: str = "Admin"
     footer_admin_link: str = "CMS Login →"
     footer_disclaimer: str = "For healthcare professional use. Not for self-medication."
     footer_rights_suffix: str = "All rights reserved."
-
-    # Home — hero
+    footer_bg_color: Optional[str] = "linear-gradient(180deg, #1F2A16 0%, #111827 100%)"
+    footer_text_color: Optional[str] = "#CBD5E1"
+    # New background configuration fields
+    background_type: str = "gradient"  # options: 'gradient', 'image', 'none'
+    background_image_url: Optional[str] = None
+    background_gradient: Optional[str] = None
+    background_size: str = "cover"
+    background_position: str = "center"
+    background_repeat: str = "no-repeat"
+    overlay_color: Optional[str] = None  # hex or rgba
+    overlay_opacity: float = 0.0  # 0.0 - 1.0
+    background_parallax: bool = False
+    social_links: Optional[List[dict]] = []
+    # SEO placeholders (global fields)
+    seo_focus_keyword: Optional[str] = None
+    seo_meta_title: Optional[str] = None
+    # ── Home Page Section Fields & Custom Backgrounds ───────────────────────
     hero_overline: str = "PHARMACEUTICAL EXCELLENCE"
     hero_title: str = "Caring Health, Curing Lives"
     hero_subtitle: str = "Wellicon Pharmaceuticals — innovating quality medicines for a healthier tomorrow."
-    hero_image_url: str = "https://static.prod-images.emergentagent.com/jobs/83ef7e25-6729-485c-a277-13adf6b5bae2/images/0340a14000abdfa6fe2572e8bfaf2174331e1d6c5839963993c79654a70415cb.png"
     hero_cta_primary: str = "Explore products"
     hero_cta_secondary: str = "About us"
+    hero_image_url: Optional[str] = None
     hero_stat1_value: str = "200+"
     hero_stat1_label: str = "Formulations"
     hero_stat2_value: str = "WHO-GMP"
@@ -238,35 +311,62 @@ class SiteSettings(BaseModel):
     hero_stat3_label: str = "Years"
     hero_badge_label: str = "Quality Assured"
     hero_badge_value: str = "ISO 9001:2015"
+    hero_image_active: bool = True
+    hero_badge_active: bool = True
+    hero_bg_color: Optional[str] = None
+    hero_bg_image_url: Optional[str] = None
 
-    # Home — sections
     home_portfolio_overline: str = "OUR PORTFOLIO"
     home_portfolio_title: str = "Therapeutic divisions"
     home_portfolio_link: str = "View all products →"
+    home_portfolio_bg_color: Optional[str] = None
+    home_portfolio_bg_image_url: Optional[str] = None
+
     home_featured_overline: str = "FEATURED RANGE"
     home_featured_title: str = "Trusted formulations"
+    home_featured_subtitle: str = (
+        "Scientific excellence and advanced manufacturing come together to deliver safe, effective and reliable pharmaceutical solutions."
+    )
+    home_featured_image_url: Optional[str] = None
+    home_featured_image_active: bool = True
+    home_featured_bg_color: Optional[str] = None
+    home_featured_bg_image_url: Optional[str] = None
+    home_featured_card_img_bg_color: Optional[str] = None
+    home_featured_card_text_bg_color: Optional[str] = None
+    home_featured_cta_title: str = "Explore our complete product range"
+    home_featured_cta_subtitle: str = "Quality you can trust, care you can count on."
+    home_featured_cta_btn_text: str = "View All Products"
+    home_featured_cta_btn_link: str = "/products"
+
     trust1_title: str = "R&D Driven"
     trust1_body: str = "In-house formulation development and validation laboratories."
     trust2_title: str = "Quality First"
     trust2_body: str = "WHO-GMP compliant manufacturing with stringent QC protocols."
     trust3_title: str = "Patient Focused"
     trust3_body: str = "Affordable medicines that reach every corner of the country."
+    trust_bg_color: Optional[str] = "#0F172A"
+    trust_bg_image_url: Optional[str] = None
+
     home_about_overline: str = "WHO WE ARE"
+    about_title: str = "About Wellicon Pharma"
+    about_body: str = "Founded with a single purpose — to deliver world-class pharmaceutical formulations across India and beyond."
     home_about_link: str = "Read more about us"
     home_quality_stat_value: str = "98%"
     home_quality_stat_label: str = "Quality Score"
     home_therapy_stat_value: str = "12+"
     home_therapy_stat_label: str = "Therapy Areas"
+    home_about_bg_color: Optional[str] = None
+    home_about_bg_image_url: Optional[str] = None
+    home_about_card1_bg_color: Optional[str] = None
+    home_about_card2_bg_color: Optional[str] = None
 
-    # About page
-    about_overline: str = "ABOUT US"
-    about_title: str = "About Wellicon Pharma"
-    about_body: str = (
+    about_description: str = (
         "Founded with a single purpose — to deliver world-class pharmaceutical formulations across India and beyond. "
         "Wellicon Pharma combines cutting-edge research with stringent quality control to bring trusted medicines to "
         "healthcare professionals and patients. Our portfolio spans antibacterials, gastroenterology, cardiovascular, "
         "pain management and nutraceutical solutions."
     )
+    
     about_image_url: str = "https://static.prod-images.emergentagent.com/jobs/83ef7e25-6729-485c-a277-13adf6b5bae2/images/c8e9ea12b401d8b4340e8a29134972a32009a205b35612418ecc97cafd2086c2.png"
     about_badge1: str = "WHO-GMP Certified"
     about_badge2: str = "ISO 9001:2015"
@@ -277,8 +377,8 @@ class SiteSettings(BaseModel):
     about_vision_overline: str = "OUR VISION"
     about_vision: str = (
         "To be recognised globally as a benchmark for quality, integrity and innovation in pharmaceuticals — "
-        "empowering healthcare professionals and patients with reliable formulations across every therapeutic segment."
-    )
+        "empowering healthcare professionals and patients with reliable formulations across every therapeutic segment.")
+    
 
     # Products page
     products_overline: str = "CATALOGUE"
@@ -399,11 +499,33 @@ async def upload_file(file: UploadFile = File(...), user: dict = Depends(get_cur
 
 @api_router.get("/files/{path:path}")
 async def serve_file(path: str):
-    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
-    if not record:
+    local_filepath = UPLOAD_CACHE_DIR / path.replace("/", os.sep)
+
+    # 1. Fast Path: Serve directly from local disk cache via FileResponse with HTTP cache headers (0-2ms latency!)
+    if os.path.isfile(local_filepath):
+        return FileResponse(
+            path=str(local_filepath),
+            headers=CACHE_HEADERS,
+        )
+
+    # 2. Remote storage fallback
+    try:
+        data, content_type = get_object(path)
+        try:
+            os.makedirs(local_filepath.parent, exist_ok=True)
+            with open(local_filepath, "wb") as f:
+                f.write(data)
+        except Exception as e:
+            logger.warning(f"Failed to cache file to disk: {e}")
+
+        return FastAPIResponse(
+            content=data,
+            media_type=content_type or "image/jpeg",
+            headers=CACHE_HEADERS,
+        )
+    except Exception as e:
+        logger.error(f"Error serving file {path}: {e}")
         raise HTTPException(status_code=404, detail="File not found")
-    data, content_type = get_object(path)
-    return FastAPIResponse(content=data, media_type=record.get("content_type", content_type))
 
 
 # ---------- Categories ----------
@@ -534,8 +656,10 @@ async def get_settings():
         defaults["id"] = "site"
         await db.settings.insert_one(defaults)
         defaults.pop("_id", None)
-        return defaults
+        doc = defaults
     merged = merge_settings(doc)
+    social_items = await db.social_media.find({}, {"_id": 0}).sort("display_order", 1).to_list(1000)
+    merged["social_links"] = social_items if social_items else merged.get("social_links", [])
     merged["id"] = "site"
     return merged
 
@@ -544,8 +668,38 @@ async def get_settings():
 async def update_settings(payload: SiteSettings, user: dict = Depends(get_current_user)):
     data = payload.model_dump()
     await db.settings.update_one({"id": "site"}, {"$set": data}, upsert=True)
+    if payload.social_links:
+        for item in payload.social_links:
+            item_id = item.get("id") or str(uuid.uuid4())
+            item["id"] = item_id
+            await db.social_media.update_one({"id": item_id}, {"$set": item}, upsert=True)
     data["id"] = "site"
     return data
+
+
+# ---------- Site-settings Favicon Upload ----------
+@api_router.post("/site-settings/favicon")
+async def upload_favicon(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
+    allowed_types = {"image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon", "image/jpeg", "image/gif", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Allowed: png, svg, ico, jpg, gif, webp")
+    content = await file.read()
+    if len(content) > 2 * 1024 * 1024:  # 2 MiB max
+        raise HTTPException(status_code=400, detail="Favicon file exceeds 2 MiB limit")
+    ext = (file.filename.rsplit(".", 1)[-1] if "." in file.filename else "png").lower()
+    path = f"{APP_NAME}/favicons/{uuid.uuid4().hex}.{ext}"
+    result = put_object(path, content, file.content_type)
+    record = {
+        "storage_path": result["path"],
+        "original_filename": file.filename,
+        "content_type": file.content_type,
+        "size": result.get("size", len(content)),
+        "is_deleted": False,
+        "created_at": now_iso(),
+    }
+    await db.files.insert_one(record)
+    url = f"/api/files/{result['path']}"
+    return {"url": url, "path": result["path"]}
 
 
 # ---------- Inquiries ----------
@@ -564,6 +718,46 @@ async def create_inquiry(payload: InquiryCreate):
 async def list_inquiries(user: dict = Depends(get_current_user)):
     items = await db.inquiries.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return items
+
+# ---------- Social Media Management ----------
+async def sync_social_links_to_settings():
+    items = await db.social_media.find({}, {"_id": 0}).sort("display_order", 1).to_list(1000)
+    await db.settings.update_one({"id": "site"}, {"$set": {"social_links": items}}, upsert=True)
+    return items
+
+@api_router.get("/social-media")
+async def list_social_media():
+    items = await db.social_media.find({}, {"_id": 0}).sort("display_order", 1).to_list(1000)
+    if not items:
+        site_doc = await db.settings.find_one({"id": "site"}, {"_id": 0})
+        if site_doc and site_doc.get("social_links"):
+            items = site_doc["social_links"]
+    return items
+
+@api_router.post("/social-media")
+async def create_social_media(item: SocialMediaItem, user: dict = Depends(get_current_user)):
+    doc = item.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    await db.social_media.insert_one(doc)
+    doc.pop("_id", None)
+    await sync_social_links_to_settings()
+    return doc
+
+@api_router.put("/social-media/{item_id}")
+async def update_social_media(item_id: str, item: SocialMediaItem, user: dict = Depends(get_current_user)):
+    result = await db.social_media.update_one({"id": item_id}, {"$set": item.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Social media item not found")
+    updated = await db.social_media.find_one({"id": item_id}, {"_id": 0})
+    await sync_social_links_to_settings()
+    return updated
+
+@api_router.delete("/social-media/{item_id}")
+async def delete_social_media(item_id: str, user: dict = Depends(get_current_user)):
+    await db.social_media.delete_one({"id": item_id})
+    await sync_social_links_to_settings()
+    return {"ok": True}
+
 
 
 @api_router.put("/inquiries/{inquiry_id}/read")
